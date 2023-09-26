@@ -7,6 +7,13 @@ class Empresa {
 	const clientes = #{}
 	var property honorariosDeReferencia = 0
 	
+	method agregarCliente(unCliente) {
+		clientes.add(unCliente)
+	}
+	method quitarCliente(unCliente) {
+		clientes.remove(unCliente)
+	}
+	
 	method cuantosEstudiaronEn(unaUniversidad) = profesionales.count({p=>p.universidad() == unaUniversidad})
 	method profesionalesCaros() {
 		return profesionales.filter({p=>p.honorariosPorHora() > honorariosDeReferencia})
@@ -24,7 +31,22 @@ class Empresa {
 	method puedeSatisfacer(unSolicitante) {
 		return profesionales.any({p=>unSolicitante.puedeSerAtendidoPor(p)})
 	}
-	method darServicio(unSolicitante) {
-		profesionales.anyOne // devuele un objeto aleatorio de una coleccion
+	
+	method profesionalesQuePuedenAtenderA(unSolicitante){
+		return profesionales.filter({p=>unSolicitante.puedeSerAtendidoPor(p)})
 	}
+	
+	method darServicio(unSolicitante) {
+		if (not self.puedeSatisfacer(unSolicitante)){
+			self.error("Ningun profesional no puede satisfacer al solicitante")	
+		}
+		
+		const profesional = self.profesionalesQuePuedenAtenderA(unSolicitante).anyOne()
+		profesional.cobrar(profesional.honorariosPorHora()) // devuele un objeto aleatorio de una coleccion
+		self.agregarCliente(unSolicitante)
+	}
+	
+	method cantidadClientes() = clientes.size()
+	method tieneComoCliente(unSolicitante) = clientes.contains(unSolicitante)
+	
 }
